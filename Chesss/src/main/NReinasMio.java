@@ -16,7 +16,7 @@ public class NReinasMio {
     List<Cell> piezas = new ArrayList<>();
     private int puestas;
  
-    public NReinasMio(int tamanio, int cantReinas, int cantTorre, int cantAlfil){
+    public NReinasMio(int tamanio, int cantReinas, int cantTorre, int cantAlfil, int kings){
         this.n = tamanio;
         allowedCells = new HashMap<>();
         for (int i = 0; i < cantReinas; i++){
@@ -37,7 +37,13 @@ public class NReinasMio {
             boolean[][] aux = new boolean[n][n];
             allowedCells.put(c, aux);
         }
-        if (tamanio < 4) throw new NullPointerException();
+         for (int i = 0; i < kings; i++){
+            Cell c = new Cell("K" + i);
+            piezas.add(c);
+            boolean[][] aux = new boolean[n][n];
+            allowedCells.put(c, aux);
+        }
+        //if (tamanio < 4) throw new NullPointerException();
 
         inicializar();
     }
@@ -69,7 +75,7 @@ public class NReinasMio {
     }
     
     private void buscarSolucion2(int row, int col, Cell pieza, Boolean exito){
-        if (sePuedeColocar(row, col) && !estaPuesta(pieza)){
+        if (sePuedeColocar(row, col, pieza) && !estaPuesta(pieza)){
            //System.out.println("pongo " + row + " " + col);
            poner(row, col, pieza);
            //System.out.println(solutionBoard);
@@ -108,11 +114,6 @@ public class NReinasMio {
         }
     }
     
-//    private boolean pase(int row, int col){
-//        //System.out.println(solutionBoard.matrix[row][col].piece);
-//        return !solutionBoard.matrix[row][col].piece.equals(Cell.EMPTY_CELL);
-//    }
-    
     private boolean termine(int row, int col){
         return (row == n-1 && col == n-1) || puestas == piezas.size();
     }
@@ -150,6 +151,32 @@ public class NReinasMio {
         }else if (pieza.piece.startsWith("A")){
             diagonalInferior[col-row+n-1] = b;
             diagonalSuperior[col+row] = b;
+        }else if (pieza.piece.startsWith("K")){
+            allowedCells.get(pieza)[row][col] = b;
+            if (row > 0){
+                 allowedCells.get(pieza)[row - 1][col] = b;
+                 if (col < n - 1){
+                     allowedCells.get(pieza)[row - 1][col + 1] = b;
+                 }
+            }
+            if (col < n - 1){
+                allowedCells.get(pieza)[row][col + 1] = b;
+                if (row < n - 1){
+                    allowedCells.get(pieza)[row + 1][col + 1] = b;
+                }
+            }
+            if (row < n -1){
+                allowedCells.get(pieza)[row + 1][col] = b;
+                if (col > 0){
+                    allowedCells.get(pieza)[row + 1][col - 1] = b;
+                }
+            }
+            if (col > 0){
+                allowedCells.get(pieza)[row][col - 1] = b;
+                if (row > 0){
+                    allowedCells.get(pieza)[row - 1][col - 1] = b;
+                }
+            }
         }
     }
     
@@ -206,79 +233,96 @@ public class NReinasMio {
 //        System.out.println("");
 //    }
     
-    private boolean sePuedeColocar(int row, int col){
+    private boolean sePuedeColocar(int row, int col, Cell pieza){
         for (boolean[][] aux: allowedCells.values()){
             if (!aux[row][col]){
                 return false;
             }
         }
-        
-        return diagonalInferior[col-row+n-1] && diagonalSuperior[col+row];
-        //return horizontal[row] && vertical[col] && diagonalInferior[col-row+n-1] && diagonalSuperior[col+row];
+        if (!(diagonalInferior[col-row+n-1] && diagonalSuperior[col+row])){
+                return false;
+            }
+        if (pieza.piece.startsWith("R")){
+            
+        }else if (pieza.piece.startsWith("K")){
+            //System.out.println(solutionBoard);
+            Cell[][] aux = solutionBoard.matrix;
+            if (!aux[row][col].piece.equals(Cell.EMPTY_CELL)) {
+                return false;
+            }
+            if (row > 0) {
+                if (!aux[row-1][col].piece.equals(Cell.EMPTY_CELL)) {
+                    return false;
+                }
+                if (col < n - 1) {
+                    if (!aux[row - 1][col + 1].piece.equals(Cell.EMPTY_CELL)) {
+                        return false;
+                    }
+                }
+            }
+            if (col < n - 1) {
+                if (!aux[row][col + 1].piece.equals(Cell.EMPTY_CELL)) {
+                    return false;
+                }
+                if (row < n - 1) {
+                    if (!aux[row + 1][col + 1].piece.equals(Cell.EMPTY_CELL)) {
+                        return false;
+                    }
+                }
+            }
+            if (row < n - 1) {
+                if (!aux[row + 1][col].piece.equals(Cell.EMPTY_CELL)) {
+                    return false;
+                }
+                if (col > 0) {
+                    if (!aux[row + 1][col - 1].piece.equals(Cell.EMPTY_CELL)) {
+                        return false;
+                    }
+                }
+            }
+            if (col > 0) {
+                if (!aux[row][col - 1].piece.equals(Cell.EMPTY_CELL)) {
+                    return false;
+                }
+                if (row > 0) {
+                    if (!aux[row - 1][col - 1].piece.equals(Cell.EMPTY_CELL)) {
+                        return false;
+                    }
+                }
+            }
+
+        }
+        return true;
     }
- 
-//    private void buscarSolucion(int fila){
-//        int col = 0;
-//        while (col < n && !haySolucion){
-//            if (horizontal[fila] && vertical[col] && diagonalInferior[col-fila+n-1] && diagonalSuperior[col+fila]){
-//                
-//                solutionBoard.putPiece(fila, col, "R");
-//                horizontal[fila] = false;
-//                vertical[col] = false;
-//                diagonalInferior[col-fila+n-1] = false;
-//                diagonalSuperior[col+fila] = false;
-// 
-//                if (fila == n-1 /*&& solucionNueva(this.solucion) */ && isNewSolution(solutionBoard)){
-//                    haySolucion = true;
-//                }else{
-//                    if (fila+1 < n ){
-//                        buscarSolucion(fila+1); 
-//                    }
-//                    if (!haySolucion){                  
-//                        solutionBoard.resetCell(fila, col);
-//                        horizontal[fila] = true;
-//                        vertical[col] = true;
-//                        diagonalInferior[col-fila+n-1] = true;
-//                        diagonalSuperior[col+fila] = true;
-// 
-//                    }
-//                }
-//            }
-//            col++;
-//        }
-//    }
-    
+
     public void buscarSoluciones2(){
         
 //        Boolean exito = false;
 //        buscarSolucion2(0, 2, piezas.get(0), exito);
 //        buscarSolucion2(0, 1, piezas.get(0), exito);
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                Boolean exito = false;
-                //System.out.println("voy con " + i + " " + j);
-                buscarSolucion2(i, j, piezas.get(0), exito);
-                inicializar();
+        boolean hayDistintas = true;
+        int k = 0;
+        Cell aux = null;
+        while (k < piezas.size()) {
+            if (aux == null || !aux.piece.startsWith(piezas.get(k-1).piece)) {
+                aux = piezas.get(k);
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j < n; j++) {
+                        Boolean exito = false;
+                        //System.out.println("voy con " + i + " " + j);
+                        buscarSolucion2(i, j, aux, exito);
+                        inicializar();
+                    }
+                }
             }
+            k++;
         }
+        
 //        inicializar();
 //        marcarDiagonales(3, 3, false);
 //        printCells();
     }
-//    public void buscarSoluciones(){
-//        boolean flag = true;
-//        while(flag){
-//            buscarSolucion(0);
-//            if (isNewSolution(solutionBoard)){
-//                flag = true;
-//                addSolution();
-//            } else{
-//                flag = false;
-//            }
-//            inicializar();
-//        }
-//
-//    }
+
     
     private void addSolution(){
         solutions.add(this.solutionBoard.cloneBoard());

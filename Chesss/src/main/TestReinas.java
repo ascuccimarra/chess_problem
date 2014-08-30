@@ -9,7 +9,7 @@ public class TestReinas {
      * @param args
      */
     public static void main(String[] args) {
-        NReinasMio reinas= new NReinasMio(8,5,1,1);
+        NReinasMio reinas= new NReinasMio(7,2,2,1,4);
         //reinas.buscarUnaSolucion();
         reinas.buscarSoluciones2();
         List<Board> solutions = reinas.getSolutions();
