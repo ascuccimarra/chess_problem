@@ -1,6 +1,7 @@
 package main;
  
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +91,9 @@ public class NReinasMio {
                     while (j < n){
                         //System.out.println("i: " + i + " j: " + j);
                         //if (!exito){
-                            buscarSolucion2(i, j, piezas.get(puestas), exito);
+                            if (puestas < piezas.size()){
+                                buscarSolucion2(i, j, piezas.get(puestas), exito);
+                            }
                         //}
                         
                         j++;
@@ -111,6 +114,7 @@ public class NReinasMio {
     }
     
     private void poner(int row, int col, Cell pieza){
+        //System.out.println(solutionBoard);
         solutionBoard.putPiece(row, col, pieza.piece);
         puestas++;
         toggleCell(row, col, pieza, false);
@@ -140,6 +144,7 @@ public class NReinasMio {
         }else if (pieza.piece.startsWith("A")){
             marcarDiagonales(row, col, pieza, b);
         }else if (pieza.piece.startsWith("C")){
+            allowedCells.get(pieza)[row][col] = b;
             for (int i = 0; i < 8; i++){
                 int x = xCaballo[i] + row;
                 int y = yCaballo[i] + col;
@@ -177,6 +182,7 @@ public class NReinasMio {
     }
     
     private void sacar(int row, int col, Cell pieza){
+        //System.out.println(solutionBoard);
         solutionBoard.resetCell(row, col);
         puestas--;
         toggleCell(row, col, pieza, true);
@@ -385,16 +391,18 @@ public class NReinasMio {
 //        Boolean exito = false;
 //        buscarSolucion2(0, 2, piezas.get(0), exito);
 //        buscarSolucion2(0, 1, piezas.get(0), exito);
-        boolean hayDistintas = true;
+//        boolean hayDistintas = true;
         int k = 0;
         Cell aux = null;
         while (k < piezas.size()) {
             if (aux == null || !aux.piece.startsWith(piezas.get(k-1).piece)) {
                 aux = piezas.get(k);
+                Collections.swap(piezas, 0, k);
                 for (int i = 0; i < n; i++) {
                     for (int j = 0; j < n; j++) {
                         Boolean exito = false;
                         //System.out.println("voy con " + i + " " + j);
+                        //Cell aux = piezas.get(0);
                         buscarSolucion2(i, j, aux, exito);
                         inicializar();
                     }
