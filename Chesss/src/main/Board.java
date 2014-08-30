@@ -72,7 +72,7 @@ public class Board {
         String text = "";
         for (int i = 0; i < rows; i++){
             for (int j = 0; j < cols; j++){
-                text += matrix[i][j].piece + " ";
+                text += matrix[i][j].piece.substring(0, 1) + " ";
             }
             text += "\n";
         }

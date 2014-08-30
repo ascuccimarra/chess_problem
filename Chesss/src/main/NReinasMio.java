@@ -7,25 +7,16 @@ import java.util.Map;
  
 public class NReinasMio {
  
-    //private boolean[] horizontal;
-    //private boolean[] vertical;
     private boolean[] diagonalSuperior;
     private boolean[] diagonalInferior;
     private int n;
-    //private boolean [][] allowedCells;
     Map<Cell, boolean [][]> allowedCells;
     private Board solutionBoard;
-    private boolean haySolucion;
     private List<Board> solutions = new ArrayList<>();
-    private final int cantReinas;
-    //private int aPoner;
-    private final int cantTorre;
     List<Cell> piezas = new ArrayList<>();
     private int puestas;
  
-    public NReinasMio(int tamanio, int cantReinas, int cantTorre){
-        this.cantReinas = cantReinas;
-        this.cantTorre = cantTorre;
+    public NReinasMio(int tamanio, int cantReinas, int cantTorre, int cantAlfil){
         this.n = tamanio;
         allowedCells = new HashMap<>();
         for (int i = 0; i < cantReinas; i++){
@@ -36,6 +27,12 @@ public class NReinasMio {
         }
         for (int i = 0; i < cantTorre; i++){
             Cell c = new Cell("T" + i);
+            piezas.add(c);
+            boolean[][] aux = new boolean[n][n];
+            allowedCells.put(c, aux);
+        }
+        for (int i = 0; i < cantAlfil; i++){
+            Cell c = new Cell("A" + i);
             piezas.add(c);
             boolean[][] aux = new boolean[n][n];
             allowedCells.put(c, aux);
@@ -67,7 +64,6 @@ public class NReinasMio {
             this.diagonalInferior[i] = true;
             this.diagonalSuperior[i] = true;
         }
-        haySolucion = false;
         this.puestas = 0;
         //this.aPoner = cantReinas + cantTorre;
     }
@@ -84,7 +80,6 @@ public class NReinasMio {
                 if (puestas == piezas.size()){
                     if (isNewSolution(solutionBoard)){
                         //solutionBoard.print();
-                        haySolucion = true;
                         addSolution();
                         sacar(row, col, pieza);
                     }
@@ -152,6 +147,9 @@ public class NReinasMio {
             }
             //System.out.println(solutionBoard);
             //printCells();
+        }else if (pieza.piece.startsWith("A")){
+            diagonalInferior[col-row+n-1] = b;
+            diagonalSuperior[col+row] = b;
         }
     }
     
