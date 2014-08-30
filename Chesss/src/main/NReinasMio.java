@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
  
 public class NReinasMio {
- 
-    private boolean[] diagonalSuperior;
-    private boolean[] diagonalInferior;
+    
+    private int[] xCaballo;
+    private int [] yCaballo;
     private int n;
     Map<Cell, boolean [][]> allowedCells;
     private Board solutionBoard;
@@ -16,7 +16,7 @@ public class NReinasMio {
     List<Cell> piezas = new ArrayList<>();
     private int puestas;
  
-    public NReinasMio(int tamanio, int cantReinas, int cantTorre, int cantAlfil, int kings){
+    public NReinasMio(int tamanio, int cantReinas, int cantTorre, int cantAlfil, int kings, int caballos){
         this.n = tamanio;
         allowedCells = new HashMap<>();
         for (int i = 0; i < cantReinas; i++){
@@ -37,18 +37,24 @@ public class NReinasMio {
             boolean[][] aux = new boolean[n][n];
             allowedCells.put(c, aux);
         }
-         for (int i = 0; i < kings; i++){
+        for (int i = 0; i < kings; i++){
             Cell c = new Cell("K" + i);
             piezas.add(c);
             boolean[][] aux = new boolean[n][n];
             allowedCells.put(c, aux);
         }
-        //if (tamanio < 4) throw new NullPointerException();
-
+        for (int i = 0; i < caballos; i++){
+            Cell c = new Cell("C" + i);
+            piezas.add(c);
+            boolean[][] aux = new boolean[n][n];
+            allowedCells.put(c, aux);
+        }
         inicializar();
     }
  
     private void inicializar(){
+        xCaballo = new int[]{1, 1, 2, 2, -1, -1, -2, -2};
+        yCaballo = new int[]{2, -2, 1, -1, 2, -2, 1, -1};
         for (boolean[][] aux: allowedCells.values()){
             for (int i = 0; i < n; i++){
                 for (int j=0; j < n; j++){
@@ -56,22 +62,8 @@ public class NReinasMio {
                 }
             }
         }
-        
-        //this.horizontal = new boolean[n];
-        //this.vertical = new boolean[n];
         this.solutionBoard = new Board(n, n);
-//        for (int i = 0; i<n;i++){
-//            this.horizontal [i] = true;
-//            this.vertical [i] = true;
-//        }
-        this.diagonalInferior = new boolean[2*n-1];
-        this.diagonalSuperior = new boolean[2*n-1];
-        for (int i = 0; i<2*n-1;i++){
-            this.diagonalInferior[i] = true;
-            this.diagonalSuperior[i] = true;
-        }
         this.puestas = 0;
-        //this.aPoner = cantReinas + cantTorre;
     }
     
     private void buscarSolucion2(int row, int col, Cell pieza, Boolean exito){
@@ -125,6 +117,10 @@ public class NReinasMio {
         
     }
     
+    private boolean perteneceAlTablero(int row, int col){
+        return row >= 0 && row < n && col >= 0 && col < n;
+    }
+    
     private void toggleCell(int row, int col, Cell pieza, boolean b){
         if (pieza.piece.startsWith("R")){
             for (int i = 0; i < n; i++){
@@ -133,12 +129,7 @@ public class NReinasMio {
             for (int i = 0; i < n; i++){
                 allowedCells.get(pieza)[i][col] = b; //marca columna
             }
-            //System.out.println(solutionBoard);
-            //printCells();
-            //marcarDiagonales(row, col, b);
-            diagonalInferior[col-row+n-1] = b;
-            diagonalSuperior[col+row] = b;
-            
+            marcarDiagonales(row, col, pieza, b);
         }else if (pieza.piece.startsWith("T")){
             for (int i = 0; i < n; i++){
                 allowedCells.get(pieza)[row][i] = b;
@@ -146,11 +137,16 @@ public class NReinasMio {
             for (int i = 0; i < n; i++){
                 allowedCells.get(pieza)[i][col] = b;
             }
-            //System.out.println(solutionBoard);
-            //printCells();
         }else if (pieza.piece.startsWith("A")){
-            diagonalInferior[col-row+n-1] = b;
-            diagonalSuperior[col+row] = b;
+            marcarDiagonales(row, col, pieza, b);
+        }else if (pieza.piece.startsWith("C")){
+            for (int i = 0; i < 8; i++){
+                int x = xCaballo[i] + row;
+                int y = yCaballo[i] + col;
+                if (perteneceAlTablero(x, y)){
+                    allowedCells.get(pieza)[x][y] = b;
+                }
+            }
         }else if (pieza.piece.startsWith("K")){
             allowedCells.get(pieza)[row][col] = b;
             if (row > 0){
@@ -187,51 +183,52 @@ public class NReinasMio {
     }
     
     private void marcarDiagonales(int row, int col, Cell pieza, boolean b){
-        if (row >= col){
-            int i = row - col;
-            int j = 0;
-            while (i < n && j < n){
-                allowedCells.get(pieza)[i][j] = b;
-                i++;
-                j++;
-            }
-            i = 0;
-            j = row + col;
-            if (j > n - 1){
-                j = n - 1;
-            }
-            while (i < n &&  j >= 0 && j < n && i >= 0){
-                allowedCells.get(pieza)[i][j] = b;
-                i++;
-                j--;
-            }
-        }else{
-            int i = 0;
-            int j = col - row;
-            while (i < n && j < n){
-                allowedCells.get(pieza)[i][j] = b;
-                i++;
-                j++;
-            }
+        int i = row;
+        int j = col;
+        while (i >= 0 && j >= 0){
+            allowedCells.get(pieza)[i][j] = b;
+            i--;
+            j--;
+        }
+        i = row;
+        j = col;
+        while (i < n && j < n){
+            allowedCells.get(pieza)[i][j] = b;
+            i++;
+            j++;
+        }
+        i = row;
+        j = col;
+        while (i >= 0 && j < n){
+            allowedCells.get(pieza)[i][j] = b;
+            i--;
+            j++;
+        }
+        i = row;
+        j = col;
+        while (i < n && j >= 0){
+            allowedCells.get(pieza)[i][j] = b;
+            i++;
+            j--;
         }
     }
     
-//    public void printCells(){
-//        String text = "";
-//        for (int i = 0; i < n; i++){
-//            for (int j = 0; j < n; j++){
-//                if (allowedCells[i][j]){
-//                    text += "-";
-//                }else{
-//                    text += "x";
-//                }
-//                text += " ";
-//            }
-//            text += "\n";
-//        }
-//        System.out.println(text);
-//        System.out.println("");
-//    }
+    public void printCells(Cell pieza){
+        String text = "";
+        for (int i = 0; i < n; i++){
+            for (int j = 0; j < n; j++){
+                if (allowedCells.get(pieza)[i][j]){
+                    text += "-";
+                }else{
+                    text += "x";
+                }
+                text += " ";
+            }
+            text += "\n";
+        }
+        System.out.println(text);
+        System.out.println("");
+    }
     
     private boolean sePuedeColocar(int row, int col, Cell pieza){
         for (boolean[][] aux: allowedCells.values()){
@@ -239,11 +236,38 @@ public class NReinasMio {
                 return false;
             }
         }
-        if (!(diagonalInferior[col-row+n-1] && diagonalSuperior[col+row])){
+        if (pieza.piece.startsWith("R")){
+            if (!sePuedenDiagonales(row, col)){
                 return false;
             }
-        if (pieza.piece.startsWith("R")){
-            
+            if (!sePuedeFila(row, col)){
+                return false;
+            }
+            if (!sePuedeColumna(row, col)){
+                return false;
+            }
+        }else if (pieza.piece.startsWith("A")){
+            if (!sePuedenDiagonales(row, col)){
+                return false;
+            }
+        }else if (pieza.piece.startsWith("T")){
+             if (!sePuedeFila(row, col)){
+                return false;
+            }
+            if (!sePuedeColumna(row, col)){
+                return false;
+            }
+        }else if (pieza.piece.startsWith("C")){
+            Cell[][] aux = solutionBoard.matrix;
+            for (int i = 0; i < 8; i++){
+                int x = xCaballo[i] + row;
+                int y = yCaballo[i] + col;
+                if (perteneceAlTablero(x, y)){
+                    if (!aux[x][y].piece.equals(Cell.EMPTY_CELL)) {
+                        return false;
+                    }
+                }
+            }
         }else if (pieza.piece.startsWith("K")){
             //System.out.println(solutionBoard);
             Cell[][] aux = solutionBoard.matrix;
@@ -294,6 +318,67 @@ public class NReinasMio {
         }
         return true;
     }
+    
+    private boolean sePuedenDiagonales(int row, int col){
+        Cell[][] aux = solutionBoard.matrix;
+        int i = row;
+        int j = col;
+        while (i >= 0 && j >= 0){
+            if (!aux[i][j].piece.equals(Cell.EMPTY_CELL)){
+                return false;
+            }
+            i--;
+            j--;
+        }
+        i = row;
+        j = col;
+        while (i < n && j < n){
+            if (!aux[i][j].piece.equals(Cell.EMPTY_CELL)){
+                return false;
+            }
+            i++;
+            j++;
+        }
+        i = row;
+        j = col;
+        while (i >= 0 && j < n){
+            if (!aux[i][j].piece.equals(Cell.EMPTY_CELL)){
+                return false;
+            }
+            i--;
+            j++;
+        }
+        i = row;
+        j = col;
+        while (i < n && j >= 0){
+            if (!aux[i][j].piece.equals(Cell.EMPTY_CELL)){
+                return false;
+            }
+            i++;
+            j--;
+        }
+        return true;
+    }
+    
+    private boolean sePuedeFila(int row, int col){
+        Cell[][] aux = solutionBoard.matrix;
+        for (int i=0; i < n; i++){
+             if (!aux[row][i].piece.equals(Cell.EMPTY_CELL)){
+                return false; 
+             }
+        }
+        return true;
+    }
+    
+    private boolean sePuedeColumna(int row, int col){
+        Cell[][] aux = solutionBoard.matrix;
+        for (int i=0; i < n; i++){
+             if (!aux[i][col].piece.equals(Cell.EMPTY_CELL)){
+                return false; 
+             }
+        }
+        return true;
+    }
 
     public void buscarSoluciones2(){
         
@@ -317,10 +402,39 @@ public class NReinasMio {
             }
             k++;
         }
-        
+//        Cell c = new Cell("R");
+//        piezas.add(c);
+//        boolean[][] aux = new boolean[n][n];
+//        allowedCells.put(c, aux);
+//        
+//         inicializar();
+//        marcarDiagonales(0, 0, c, false);
+//        printCells(c);
+//        
+//         inicializar();
+//        marcarDiagonales(0, 3, c, false);
+//        printCells(c);
+//        
+//          inicializar();
+//        marcarDiagonales(3, 0, c, false);
+//        printCells(c);
+//        
+//        
 //        inicializar();
-//        marcarDiagonales(3, 3, false);
-//        printCells();
+//        marcarDiagonales(2, 1, c, false);
+//        printCells(c);
+//
+//        inicializar();
+//        marcarDiagonales(3, 1, c, false);
+//        printCells(c);
+//        
+//        inicializar();
+//        marcarDiagonales(3, 3, c, false);
+//        printCells(c);
+//        
+//        inicializar();
+//        marcarDiagonales(2, 2, c, false);
+//        printCells(c);
     }
 
     
