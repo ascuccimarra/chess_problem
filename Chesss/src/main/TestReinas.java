@@ -21,6 +21,29 @@ public class TestReinas {
             System.out.println("");
         }
         
+        reinas= new NReinasMio(4,0,0,2,1,2);
+        //reinas.buscarUnaSolucion();
+        reinas.buscarSoluciones2();
+        solutions = reinas.getSolutions();
+        
+        for (int i = 0; i < solutions.size(); i++){
+            Board b = solutions.get(i);
+            System.out.println("solucion: " + i);
+            System.out.println(b);
+            System.out.println("");
+        }
+        
+        reinas= new NReinasMio(8,8,0,0,0,0);
+        //reinas.buscarUnaSolucion();
+        reinas.buscarSoluciones2();
+        solutions = reinas.getSolutions();
+        
+        for (int i = 0; i < solutions.size(); i++){
+            Board b = solutions.get(i);
+            System.out.println("solucion: " + i);
+            System.out.println(b);
+            System.out.println("");
+        }
 //        NReinas reinas = new NReinas(8);
 //        //reinas.buscarUnaSolucion();
 //        reinas.buscarSoluciones();

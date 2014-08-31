@@ -8,8 +8,10 @@ import java.util.Map;
  
 public class NReinasMio {
     
-    private int[] xCaballo;
-    private int [] yCaballo;
+    //private int[] xCaballo;
+    //private int [] yCaballo;
+    private int[] xKing;
+    private int [] yKing;
     private int n;
     Map<Cell, boolean [][]> allowedCells;
     private Board solutionBoard;
@@ -56,6 +58,8 @@ public class NReinasMio {
     private void inicializar(){
         xCaballo = new int[]{1, 1, 2, 2, -1, -1, -2, -2};
         yCaballo = new int[]{2, -2, 1, -1, 2, -2, 1, -1};
+        xKing = new int[]{-1, -1, -1, 0, 0, 1, 1, 1};
+        yKing = new int[]{-1, 0, 1, 1, -1, -1, 0, 1};
         for (boolean[][] aux: allowedCells.values()){
             for (int i = 0; i < n; i++){
                 for (int j=0; j < n; j++){
@@ -154,28 +158,11 @@ public class NReinasMio {
             }
         }else if (pieza.piece.startsWith("K")){
             allowedCells.get(pieza)[row][col] = b;
-            if (row > 0){
-                 allowedCells.get(pieza)[row - 1][col] = b;
-                 if (col < n - 1){
-                     allowedCells.get(pieza)[row - 1][col + 1] = b;
-                 }
-            }
-            if (col < n - 1){
-                allowedCells.get(pieza)[row][col + 1] = b;
-                if (row < n - 1){
-                    allowedCells.get(pieza)[row + 1][col + 1] = b;
-                }
-            }
-            if (row < n -1){
-                allowedCells.get(pieza)[row + 1][col] = b;
-                if (col > 0){
-                    allowedCells.get(pieza)[row + 1][col - 1] = b;
-                }
-            }
-            if (col > 0){
-                allowedCells.get(pieza)[row][col - 1] = b;
-                if (row > 0){
-                    allowedCells.get(pieza)[row - 1][col - 1] = b;
+            for (int i = 0; i < 8; i++){
+                int x = xKing[i] + row;
+                int y = yKing[i] + col;
+                if (perteneceAlTablero(x, y)){
+                    allowedCells.get(pieza)[x][y] = b;
                 }
             }
         }
@@ -219,24 +206,27 @@ public class NReinasMio {
         }
     }
     
-    public void printCells(Cell pieza){
-        String text = "";
-        for (int i = 0; i < n; i++){
-            for (int j = 0; j < n; j++){
-                if (allowedCells.get(pieza)[i][j]){
-                    text += "-";
-                }else{
-                    text += "x";
-                }
-                text += " ";
-            }
-            text += "\n";
-        }
-        System.out.println(text);
-        System.out.println("");
-    }
+//    public void printCells(Cell pieza){
+//        String text = "";
+//        for (int i = 0; i < n; i++){
+//            for (int j = 0; j < n; j++){
+//                if (allowedCells.get(pieza)[i][j]){
+//                    text += "-";
+//                }else{
+//                    text += "x";
+//                }
+//                text += " ";
+//            }
+//            text += "\n";
+//        }
+//        System.out.println(text);
+//        System.out.println("");
+//    }
     
     private boolean sePuedeColocar(int row, int col, Cell pieza){
+        if (!solutionBoard.matrix[row][col].piece.equals(Cell.EMPTY_CELL)) {
+            return false;
+        }
         for (boolean[][] aux: allowedCells.values()){
             if (!aux[row][col]){
                 return false;
@@ -264,63 +254,25 @@ public class NReinasMio {
                 return false;
             }
         }else if (pieza.piece.startsWith("C")){
-            Cell[][] aux = solutionBoard.matrix;
             for (int i = 0; i < 8; i++){
                 int x = xCaballo[i] + row;
                 int y = yCaballo[i] + col;
                 if (perteneceAlTablero(x, y)){
-                    if (!aux[x][y].piece.equals(Cell.EMPTY_CELL)) {
+                    if (!solutionBoard.matrix[x][y].piece.equals(Cell.EMPTY_CELL)) {
                         return false;
                     }
                 }
             }
         }else if (pieza.piece.startsWith("K")){
-            //System.out.println(solutionBoard);
-            Cell[][] aux = solutionBoard.matrix;
-            if (!aux[row][col].piece.equals(Cell.EMPTY_CELL)) {
-                return false;
-            }
-            if (row > 0) {
-                if (!aux[row-1][col].piece.equals(Cell.EMPTY_CELL)) {
-                    return false;
-                }
-                if (col < n - 1) {
-                    if (!aux[row - 1][col + 1].piece.equals(Cell.EMPTY_CELL)) {
+            for (int i = 0; i < 8; i++){
+                int x = xKing[i] + row;
+                int y = yKing[i] + col;
+                if (perteneceAlTablero(x, y)){
+                    if (!solutionBoard.matrix[x][y].piece.equals(Cell.EMPTY_CELL)) {
                         return false;
                     }
                 }
             }
-            if (col < n - 1) {
-                if (!aux[row][col + 1].piece.equals(Cell.EMPTY_CELL)) {
-                    return false;
-                }
-                if (row < n - 1) {
-                    if (!aux[row + 1][col + 1].piece.equals(Cell.EMPTY_CELL)) {
-                        return false;
-                    }
-                }
-            }
-            if (row < n - 1) {
-                if (!aux[row + 1][col].piece.equals(Cell.EMPTY_CELL)) {
-                    return false;
-                }
-                if (col > 0) {
-                    if (!aux[row + 1][col - 1].piece.equals(Cell.EMPTY_CELL)) {
-                        return false;
-                    }
-                }
-            }
-            if (col > 0) {
-                if (!aux[row][col - 1].piece.equals(Cell.EMPTY_CELL)) {
-                    return false;
-                }
-                if (row > 0) {
-                    if (!aux[row - 1][col - 1].piece.equals(Cell.EMPTY_CELL)) {
-                        return false;
-                    }
-                }
-            }
-
         }
         return true;
     }
@@ -410,39 +362,6 @@ public class NReinasMio {
             }
             k++;
         }
-//        Cell c = new Cell("R");
-//        piezas.add(c);
-//        boolean[][] aux = new boolean[n][n];
-//        allowedCells.put(c, aux);
-//        
-//         inicializar();
-//        marcarDiagonales(0, 0, c, false);
-//        printCells(c);
-//        
-//         inicializar();
-//        marcarDiagonales(0, 3, c, false);
-//        printCells(c);
-//        
-//          inicializar();
-//        marcarDiagonales(3, 0, c, false);
-//        printCells(c);
-//        
-//        
-//        inicializar();
-//        marcarDiagonales(2, 1, c, false);
-//        printCells(c);
-//
-//        inicializar();
-//        marcarDiagonales(3, 1, c, false);
-//        printCells(c);
-//        
-//        inicializar();
-//        marcarDiagonales(3, 3, c, false);
-//        printCells(c);
-//        
-//        inicializar();
-//        marcarDiagonales(2, 2, c, false);
-//        printCells(c);
     }
 
     
@@ -451,9 +370,6 @@ public class NReinasMio {
     }
     
     private boolean isNewSolution(Board newSolutionBoard){
-        if (newSolutionBoard.getCell(0, 0).piece.equals(Cell.EMPTY_CELL)){
-            //return false;
-        }//MMMM DUDA!!
         int i = 0;
         boolean esNueva = true;
         while (i < solutions.size() && esNueva){ 
@@ -463,9 +379,6 @@ public class NReinasMio {
             }
             i++;
         }
-//        if (esNueva){
-//            System.out.println(newSolutionBoard);
-//        }
         return esNueva;
     }
 
