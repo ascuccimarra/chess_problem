@@ -64,15 +64,12 @@ public class ChessProblem {
                     success = true;
                 }
             } else {
-                int j = col;
-                for (int i = row; i < n; i++) {
-                    while (j < n) {
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j < n; j++){
                         if (alreadyPlaced < pieces.size()) {
                             searchSolution(i, j, pieces.get(alreadyPlaced), success);
                         }
-                        j++;
                     }
-                    j = 0;
                 }
                 if (!success) {
                     remove(row, col, piece);
@@ -150,7 +147,7 @@ public class ChessProblem {
     private boolean isAlreadyOnBoard(Piece pieza) {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                if (!solutionBoard.isEmpty(i, j) && solutionBoard.getCell(i, j).getPiece().equals(pieza)) {
+                if (!solutionBoard.isEmpty(i, j) && solutionBoard.getCell(i, j).getPiece().getText().equals(pieza.getText())) {
                     return true;
                 }
             }

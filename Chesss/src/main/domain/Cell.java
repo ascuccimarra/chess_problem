@@ -26,4 +26,28 @@ public class Cell {
     public void setPiece(Piece piece) {
         this.piece = piece;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + Objects.hashCode(this.piece);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Cell other = (Cell) obj;
+        if (!Objects.equals(this.piece, other.piece)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
 }
