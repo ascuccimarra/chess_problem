@@ -58,11 +58,11 @@ public class ChessProblem {
                 if (alreadyPlaced == pieces.size()) {
                     if (isNewSolution(solutionBoard)) {
                         addSolution();
-                        remove(row, col, piece);
                     }
                 } else {
                     success = true;
                 }
+                remove(row, col, piece);
             } else {
                 for (int i = 0; i < n; i++) {
                     for (int j = 0; j < n; j++){
@@ -109,7 +109,7 @@ public class ChessProblem {
         int k = 0;
         Piece aux = null;
         while (k < pieces.size()) {
-            if (aux == null || !aux.getText().startsWith(pieces.get(k - 1).getText())) {
+            if (aux == null || !aux.getText().startsWith(pieces.get(k - 1).getText().substring(0, 1))) {
                 aux = pieces.get(k);
                 Collections.swap(pieces, 0, k);
                 for (int i = 0; i < n; i++) {
