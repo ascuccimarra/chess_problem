@@ -11,10 +11,11 @@ public class TestChessProblem {
      */
     public static void main(String[] args) {
         test(4,0,0,2,1,2);  
-        test(7,2,0,2,2,1);
-        test(8,8,0,0,0,0);
         printSolutions(test(3,0,1,0,2,0));
+        test(7,2,0,2,2,1);
+        //test(8,8,0,0,0,0);
         
+        //printSolutions(test(8,8,0,0,0,0));
     }
     
     static List<Board> test(int size, int queens, int rooks, int bishops, int kings, int knights){
@@ -47,7 +48,7 @@ public class TestChessProblem {
             Board b = solutions.get(i);
             System.out.println("Solution: " + (i + 1));
             System.out.println(b);
-            System.out.println("");
+            //System.out.println("");
         }
     }
 }
