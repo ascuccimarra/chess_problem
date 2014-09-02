@@ -52,21 +52,29 @@ public class ChessProblem {
     }
 
     private void searchSolution(int row, int col, Piece piece, Boolean success) {
-        if (isPlacable(row, col, piece) && !isAlreadyOnBoard(piece)) {
+        if (isPlacable(row, col, piece)) {
             put(row, col, piece);
             if (done(row, col)) {
                 if (alreadyPlaced == pieces.size()) {
+                    
                     if (isNewSolution(solutionBoard)) {
+                        //System.out.println(solutionBoard);
+                        System.out.println(solutions.size());
                         addSolution();
-                        remove(row, col, piece);
+                        
                     }
+                    
                 } else {
                     success = true;
                 }
+                remove(row, col, piece);
             } else {
                 for (int i = 0; i < n; i++) {
                     for (int j = 0; j < n; j++){
                         if (alreadyPlaced < pieces.size()) {
+//                            System.out.println("es menor");
+//                            System.out.println(i + " " + j);
+//                            System.out.println(pieces.get(alreadyPlaced).getText());
                             searchSolution(i, j, pieces.get(alreadyPlaced), success);
                         }
                     }
@@ -84,6 +92,8 @@ public class ChessProblem {
 
     private void put(int row, int col, Piece pieza) {
         solutionBoard.putPiece(row, col, pieza);
+//        System.out.println("pongo " + row + " " + col);
+//        System.out.println(solutionBoard);
         alreadyPlaced++;
         toggleCell(row, col, pieza, true);
     }
@@ -94,6 +104,8 @@ public class ChessProblem {
 
     private void remove(int row, int col, Piece pieza) {
         solutionBoard.resetCell(row, col);
+//        System.out.println("saco " + row + " " + col);
+//        System.out.println(solutionBoard);
         alreadyPlaced--;
         toggleCell(row, col, pieza, false);
     }
@@ -106,21 +118,31 @@ public class ChessProblem {
     }
 
     public void searchSolutions() {
-        int k = 0;
-        Piece aux = null;
-        while (k < pieces.size()) {
-            if (aux == null || !aux.getText().startsWith(pieces.get(k - 1).getText())) {
-                aux = pieces.get(k);
-                Collections.swap(pieces, 0, k);
+//        int k = 0;
+//        Piece aux = null;
+//        while (k < pieces.size()) {
+//            if (aux == null || !aux.getText().startsWith(pieces.get(k - 1).getText().substring(0, 1))) {
+//                if (aux != null){
+//                    System.out.println("aux: " + aux.getText());
+//                     System.out.println("k - 1" + pieces.get(k - 1).getText());
+//                     System.out.println(aux.getText().startsWith(pieces.get(k - 1).getText()));
+//                }
+//                aux = pieces.get(k);
+//                
+//                System.out.println(k);
+//                Collections.swap(pieces, 0, k);
                 for (int i = 0; i < n; i++) {
                     for (int j = 0; j < n; j++) {
+                        System.out.println("i " + i + " j " + j);
+                        Piece aux = pieces.get(0);
+                        System.out.println(solutionBoard);
                         searchSolution(i, j, aux, false);
                         init();
                     }
                 }
-            }
-            k++;
-        }
+//            }
+//            k++;
+//        }
     }
 
     private void addSolution() {
@@ -148,6 +170,9 @@ public class ChessProblem {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (!solutionBoard.isEmpty(i, j) && solutionBoard.getCell(i, j).getPiece().getText().equals(pieza.getText())) {
+                    System.out.println("is on board");
+                    System.out.println(solutionBoard);
+                    System.out.println("puestas " + alreadyPlaced);
                     return true;
                 }
             }
