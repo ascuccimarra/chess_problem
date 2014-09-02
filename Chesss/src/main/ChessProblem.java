@@ -52,7 +52,7 @@ public class ChessProblem {
     }
 
     private void searchSolution(int row, int col, Piece piece, Boolean success) {
-        if (isPlacable(row, col, piece) && !isAlreadyOnBoard(piece)) {
+        if (isPlacable(row, col, piece)) {
             put(row, col, piece);
             if (done(row, col)) {
                 if (alreadyPlaced == pieces.size()) {
