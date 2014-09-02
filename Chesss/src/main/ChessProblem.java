@@ -58,6 +58,9 @@ public class ChessProblem {
                 if (alreadyPlaced == pieces.size()) {
                     if (isNewSolution(solutionBoard)) {
                         addSolution();
+                        if (solutions.size() % 1000 == 0){
+                            System.out.println("Solutions found so far.. " + solutions.size());
+                        }
                     }
                 } else {
                     success = true;

@@ -14,7 +14,7 @@ public class TestChessProblem {
         printSolutions(test(4,0,2,0,0,4)); 
         printSolutions(test(3,0,1,0,2,0));
         test(8,8,0,0,0,0);
-        //test(7,2,0,2,2,1);
+        test(7,2,0,2,2,1);
     }
     
     static List<Board> test(int size, int queens, int rooks, int bishops, int kings, int knights){
